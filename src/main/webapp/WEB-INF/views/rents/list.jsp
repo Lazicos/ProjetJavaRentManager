@@ -37,18 +37,18 @@
                                 <c:forEach items="${listReservations}" var="rent">
                                 <tr>
                                     <td>${rent.id}</td>
-                                    <td>${rent.clientId}</td>
                                     <td>${rent.vehiculeId}</td>
+                                    <td>${rent.clientId}</td>
                                     <td>${rent.debut}</td>
                                     <td>${rent.fin}</td>
                                     <td>
-                                        <a class="btn btn-primary" href="${pageContext.request.contextPath}/users/details?id=2">
+                                        <!--<a class="btn btn-primary" href="${pageContext.request.contextPath}/users/details?id=2">
                                             <i class="fa fa-play"></i>
-                                        </a>
-                                        <a class="btn btn-success disabled" href="#">
+                                        </a>-->
+                                        <a class="btn btn-success" href="${pageContext.request.contextPath}/rents/update?id=${rent.id}">
                                             <i class="fa fa-edit"></i>
                                         </a>
-                                        <a class="btn btn-danger disabled" href="#">
+                                        <a class="btn btn-danger" href="${pageContext.request.contextPath}/rents/delete?id=${rent.id}">
                                             <i class="fa fa-trash"></i>
                                         </a>
                                     </td>

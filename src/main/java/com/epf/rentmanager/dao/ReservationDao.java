@@ -13,6 +13,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 import com.epf.rentmanager.exception.DaoException;
+import com.epf.rentmanager.model.Client;
 import com.epf.rentmanager.model.Reservation;
 import com.epf.rentmanager.persistence.ConnectionManager;
 
@@ -37,6 +38,7 @@ public class ReservationDao {
 	private static final String FIND_RESERVATION_QUERY = "SELECT id, client_id, vehicle_id, debut, fin FROM Reservation WHERE id=?;";
 	private static final String COUNT_RESERVATIONS_QUERY = "SELECT COUNT(id) AS count FROM Reservation;";
 	private static final String COUNT_RESERVATIONS_BY_CLIENT_QUERY = "SELECT COUNT(id) AS count FROM Reservation WHERE client_id=?;";
+	private static final String UPDATE_RESERVATION_QUERY = "UPDATE Reservation SET client_id = ?, vehicle_id = ?, debut = ?, fin = ? WHERE id=?;";
 
 	public long create(Reservation reservation) throws DaoException {
 		try {
@@ -58,12 +60,12 @@ public class ReservationDao {
 		return 0;
 	}
 
-	public long delete(Reservation reservation) throws DaoException {
+	public long delete(int id) throws DaoException {
 		try {
 			Connection conn = ConnectionManager.getConnection();
 			PreparedStatement pstmt = conn.prepareStatement(DELETE_RESERVATION_QUERY);
 
-			pstmt.setInt(1, reservation.getId());
+			pstmt.setInt(1, id);
 
 			pstmt.executeUpdate();
 
@@ -71,6 +73,30 @@ public class ReservationDao {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return 0;
+	}
+	
+	public long update(Reservation reservation) throws DaoException {
+
+		try {
+			Connection conn = ConnectionManager.getConnection();
+			PreparedStatement pstmt = conn.prepareStatement(UPDATE_RESERVATION_QUERY);
+
+			pstmt.setInt(1, reservation.getClientId());
+			pstmt.setInt(2, reservation.getVehiculeId());
+			pstmt.setDate(3, Date.valueOf(reservation.getDebut()));
+			pstmt.setDate(4, Date.valueOf(reservation.getFin()));
+
+			pstmt.setInt(5, reservation.getId());
+
+			pstmt.execute();
+			pstmt.close();
+			conn.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		return 0;
 	}
 

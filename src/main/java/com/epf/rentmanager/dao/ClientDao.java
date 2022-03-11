@@ -6,6 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,9 +36,11 @@ public class ClientDao {
 
 	private static final String CREATE_CLIENT_QUERY = "INSERT INTO Client(nom, prenom, email, naissance) VALUES(?, ?, ?, ?);";
 	private static final String DELETE_CLIENT_QUERY = "DELETE FROM Client WHERE id=?;";
+	private static final String UPDATE_CLIENT_QUERY = "UPDATE Client SET nom = ?, prenom = ?, email = ?, naissance = ? WHERE id=?;";
 	private static final String FIND_CLIENT_QUERY = "SELECT nom, prenom, email, naissance FROM Client WHERE id=?;";
 	private static final String FIND_CLIENTS_QUERY = "SELECT id, nom, prenom, email, naissance FROM Client;";
 	private static final String COUNT_CLIENTS_QUERY = "SELECT COUNT(id) AS count FROM Client;";
+	private static final String FIND_EMAIL_QUERY = "SELECT id FROM Client WHERE email=?;";
 
 	public long create(Client client) throws DaoException {
 
@@ -48,8 +53,9 @@ public class ClientDao {
 			pstmt.setString(3, client.getEmail());
 			pstmt.setDate(4, Date.valueOf(client.getBirthday()));
 
-			pstmt.executeUpdate();
-
+			pstmt.execute();
+			pstmt.close();
+			conn.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -58,21 +64,46 @@ public class ClientDao {
 		return 0;
 	}
 
-	public long delete(Client client) throws DaoException {
-		
+	public long delete(int id) throws DaoException {
+
 		try {
 			Connection conn = ConnectionManager.getConnection();
 			PreparedStatement pstmt = conn.prepareStatement(DELETE_CLIENT_QUERY);
 
-			pstmt.setInt(1, client.getId());
+			pstmt.setInt(1, id);
 
-			pstmt.executeUpdate();
-
+			pstmt.execute();
+			pstmt.close();
+			conn.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
+		return 0;
+	}
+
+	public long update(Client client) throws DaoException {
+
+		try {
+			Connection conn = ConnectionManager.getConnection();
+			PreparedStatement pstmt = conn.prepareStatement(UPDATE_CLIENT_QUERY);
+
+			pstmt.setString(1, client.getLastName());
+			pstmt.setString(2, client.getFirstName());
+			pstmt.setString(3, client.getEmail());
+			pstmt.setDate(4, Date.valueOf(client.getBirthday()));
+
+			pstmt.setInt(5, client.getId());
+
+			pstmt.execute();
+			pstmt.close();
+			conn.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		return 0;
 	}
 
@@ -94,9 +125,11 @@ public class ClientDao {
 			LocalDate clientBirthday = rs.getDate("naissance").toLocalDate();
 
 			Client client = new Client(id, clientLastName, clientFirstName, clientEmail, clientBirthday);
+			rs.close();
+			pstmt.close();
+			conn.close();
 
 			return Optional.of(client); // ou Optional.offNullable(client)
-
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -123,9 +156,13 @@ public class ClientDao {
 				LocalDate clientBirthday = rs.getDate("naissance").toLocalDate();
 
 				Client client = new Client(id, clientLastName, clientFirstName, clientEmail, clientBirthday);
-				
+
 				listClient.add(client);
 			}
+
+			rs.close();
+			pstmt.close();
+			conn.close();
 
 			return listClient;
 		} catch (SQLException e) {
@@ -134,7 +171,7 @@ public class ClientDao {
 		}
 		return null;
 	}
-	
+
 	public long count() throws DaoException {
 		int count = 0;
 		try {
@@ -145,13 +182,50 @@ public class ClientDao {
 
 			while (rs.next()) {
 				count = rs.getInt("count");
-
 			}
 
+			pstmt.execute();
+			pstmt.close();
+			conn.close();
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
 		return count;
 	}
+
+	public boolean isLegal(LocalDate birthday) throws DaoException {
+		LocalDate today = LocalDate.now();
+
+		if (birthday.until(today, ChronoUnit.YEARS) >= 18) {
+			return true;
+		} else
+			return false;
+	}
+
+	public boolean isEmailAvailable(Client client) throws DaoException {
+		Boolean emailAvailable = true;
+		try {
+			Connection conn = ConnectionManager.getConnection();
+			PreparedStatement pstmt = conn.prepareStatement(FIND_EMAIL_QUERY);
+			pstmt.setString(1, client.getEmail());
+			pstmt.execute();
+
+			ResultSet rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				emailAvailable = false;
+			}
+			rs.close();
+			pstmt.close();
+			conn.close();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return emailAvailable;
+	}
+
 }

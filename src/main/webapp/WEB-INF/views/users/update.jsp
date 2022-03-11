@@ -19,34 +19,33 @@
         </section>
 
         <!-- Main content -->
-        <c:if test="${ !empty erreur }"><p style="color:red;"><c:out value="${ erreur }" /></p></c:if>
         <section class="content">
             <div class="row">
                 <div class="col-md-12">
                     <!-- Horizontal Form -->
                     <div class="box">
                         <!-- form start -->
-                        <form class="form-horizontal" method="post" action="/rentmanager/users/create">
+                        <form class="form-horizontal" method="post" action="/rentmanager/users/update">
                             <div class="box-body">
                                 <div class="form-group">
                                     <label for="last_name" class="col-sm-2 control-label">Nom</label>
 
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Nom" value="${lastName}" required>
+                                        <input type="text" class="form-control" id="last_name" name="last_name" value="${lastName}">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="first_name" class="col-sm-2 control-label">Prenom</label>
 
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Prenom" value="${firstName}" required>
+                                        <input type="text" class="form-control" id="first_name" name="first_name" value="${firstName}">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="email" class="col-sm-2 control-label">Email</label>
 
                                     <div class="col-sm-10">
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Email"  value="${email}" required>
+                                        <input type="email" class="form-control" id="email" name="email" value="${email}">
                                     </div>
                                 </div>
                                 </div>
@@ -54,14 +53,14 @@
                                     <label for="end" class="col-sm-2 control-label">Date de naissance</label>
 
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="naissance" name="naissance" required 
-                                               data-inputmask="'alias': 'dd/mm/yyyy'" data-mask value="${naissance}">
+                                        <input type="text" class="form-control" id="naissance" name="naissance" value="${birthday}"
+                                               data-inputmask="'alias': 'dd/mm/yyyy'" data-mask>
                                     </div>
                                 </div>
                             </div>
                             <!-- /.box-body -->
-                        	<div class="box-footer">
-                                <button type="submit" id="btnSubmit" class="btn btn-info pull-right">Ajouter</button>
+                            <div class="box-footer">
+                                <button type="submit" class="btn btn-info pull-right">Modifier</button>
                             </div>
                             <!-- /.box-footer -->
                         </form>

@@ -40,6 +40,16 @@ public class ReservationService {
 		}
 		return 0;
 	}
+	
+	public long update(Reservation reservation) throws ServiceException {
+		try {
+			return this.reservationDao.update(reservation);
+		} catch (DaoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return 0;
+	}
 
 	public Reservation findById(int id) throws ServiceException {
 		try {
@@ -61,9 +71,9 @@ public class ReservationService {
 		return null;
 	}
 	
-	public long delete(Reservation reservation) throws ServiceException {
+	public long delete(int id) throws ServiceException {
 		try {
-			return this.reservationDao.delete(reservation);
+			return this.reservationDao.delete(id);
 		} catch (DaoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

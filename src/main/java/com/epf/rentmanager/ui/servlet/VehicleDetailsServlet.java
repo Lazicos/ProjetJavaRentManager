@@ -14,16 +14,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import com.epf.rentmanager.exception.ServiceException;
+import com.epf.rentmanager.model.Client;
 import com.epf.rentmanager.model.Reservation;
 import com.epf.rentmanager.model.Vehicle;
 import com.epf.rentmanager.service.ClientService;
 import com.epf.rentmanager.service.ReservationService;
 import com.epf.rentmanager.service.VehicleService;
 
-@WebServlet("/users/details")
-public class ClientDetailsServlet extends HttpServlet {
+@WebServlet("/cars/details")
+public class VehicleDetailsServlet extends HttpServlet {
 
-	private static final String clientsDetails = "/WEB-INF/views/users/details.jsp";
+	private static final String carsDetails = "/WEB-INF/views/vehicles/details.jsp";
 
 	private static final long serialVersionUID = 1L;
 
@@ -44,29 +45,29 @@ public class ClientDetailsServlet extends HttpServlet {
 			throws ServletException, IOException {
 		int id = Integer.parseInt(request.getParameter("id"));
 
-		List<Reservation> listResaClient = new ArrayList<>();
-		List<Vehicle> listVehicle = new ArrayList<>();
+		List<Reservation> listResaVehicle = new ArrayList<>();
+		List<Client> listClient = new ArrayList<>();
 		try {
-			listResaClient = this.reservationService.findResaByClientId(id);
-			request.setAttribute("user", this.clientService.findById(id));
+			listResaVehicle = this.reservationService.findResaByVehicleId(id);
+			request.setAttribute("vehicle", this.vehicleService.findById(id));
 			request.setAttribute("nb_reservations", this.reservationService.countByClientId(id));
-			request.setAttribute("listRents", listResaClient);
+			request.setAttribute("listRents", listResaVehicle);
 		} catch (ServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		try {
-			for (int i = 0; i < listResaClient.size(); i++) {
-				listVehicle.add(vehicleService.findById(listResaClient.get(i).getVehiculeId()));
+			for (int i = 0; i < listResaVehicle.size(); i++) {
+				listClient.add(clientService.findById(listResaVehicle.get(i).getClientId()));
 			}
 		} catch (ServiceException e) {
 			e.printStackTrace();
 		}
 
-		request.setAttribute("listVehicle", listVehicle);
-		request.setAttribute("nb_vehicles", listVehicle.size());
+		request.setAttribute("listClient", listClient);
+		request.setAttribute("nb_clients", listClient.size());
 		
-		this.getServletContext().getRequestDispatcher(clientsDetails).forward(request, response);
+		this.getServletContext().getRequestDispatcher(carsDetails).forward(request, response);
 	}
 }

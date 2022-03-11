@@ -3,6 +3,9 @@ package com.epf.rentmanager.ui.servlet;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,22 +17,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import com.epf.rentmanager.exception.ServiceException;
+import com.epf.rentmanager.model.Client;
 import com.epf.rentmanager.model.Reservation;
 import com.epf.rentmanager.model.Vehicle;
 import com.epf.rentmanager.service.ClientService;
 import com.epf.rentmanager.service.ReservationService;
 import com.epf.rentmanager.service.VehicleService;
 
-@WebServlet("/rents/create")
-public class ReservationCreateServlet extends HttpServlet {
-	private static final String createReservations = "/WEB-INF/views/rents/create.jsp";
+@WebServlet("/users/update")
+public class ClientUpdateServlet extends HttpServlet {
+
+	private static final String clientUpdate = "/WEB-INF/views/users/update.jsp";
 
 	private static final long serialVersionUID = 1L;
+	
+	private Client oldClient = null;
+	
+	private int id;
 
-	@Autowired
-	ReservationService reservationService;
-	@Autowired
-	VehicleService vehicleService;
 	@Autowired
 	ClientService clientService;
 
@@ -41,29 +46,40 @@ public class ReservationCreateServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		id = Integer.parseInt(request.getParameter("id"));
+		
 		try {
-			request.setAttribute("vehicles", this.vehicleService.findAll());
-			request.setAttribute("listUsers", this.clientService.findAll());
-			
-			this.getServletContext().getRequestDispatcher(createReservations).forward(request, response);
+			oldClient = clientService.findById(id);
 		} catch (ServiceException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		String birthday = oldClient.getBirthday().format(DateTimeFormatter
+			    .ofLocalizedDate(FormatStyle.SHORT));
+
+		request.setAttribute("lastName", oldClient.getLastName());
+		request.setAttribute("firstName", oldClient.getFirstName());
+		request.setAttribute("email", oldClient.getEmail());
+		request.setAttribute("birthday", birthday);
+
+		this.getServletContext().getRequestDispatcher(clientUpdate).forward(request, response);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		int vehicleId = Integer.parseInt(request.getParameter("car"));
-		int clientId = Integer.parseInt(request.getParameter("client"));
-		LocalDate debut = LocalDate.parse(request.getParameter("begin"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-		LocalDate fin = LocalDate.parse(request.getParameter("end"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+				
+		String lastName = request.getParameter("last_name");
+		String firstName = request.getParameter("first_name");
+		String email = request.getParameter("email");
+		LocalDate naissance = LocalDate.parse(request.getParameter("naissance"),
+				DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+		Client newClient = new Client(id, lastName, firstName, email, naissance);
 
 		try {
-			this.reservationService.create(new Reservation(clientId, vehicleId, debut, fin));
+			this.clientService.update(newClient);
 		} catch (ServiceException e) {
 			e.printStackTrace();
 		}
-		response.sendRedirect("http://localhost:8080/rentmanager/rents");
+		response.sendRedirect("http://localhost:8080/rentmanager/users");
 	}
 }

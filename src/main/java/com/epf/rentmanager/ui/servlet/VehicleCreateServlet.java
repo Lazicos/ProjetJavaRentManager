@@ -21,6 +21,9 @@ public class VehicleCreateServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
+	public VehicleCreateServlet() {
+    }
+	
 	@Autowired
 	VehicleService vehicleService;
 
@@ -38,7 +41,8 @@ public class VehicleCreateServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String constructeur = request.getParameter("manufacturer");
-		int nbPlaces = Integer.parseInt(request.getParameter("seats"));
+//		int nbPlaces = Integer.parseInt(request.getParameter("seats"));
+		int nbPlaces = Integer.valueOf(request.getParameter("seats"));
 
 		try {
 			this.vehicleService.create(new Vehicle(constructeur, nbPlaces));

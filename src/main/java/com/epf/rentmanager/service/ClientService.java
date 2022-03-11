@@ -1,5 +1,6 @@
 package com.epf.rentmanager.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -12,7 +13,7 @@ import com.epf.rentmanager.model.Client;
 @Service
 public class ClientService {
 
-	private ClientDao clientDao;
+	private static ClientDao clientDao;
 //	public static ClientService instance;
 
 //	private ClientService() {
@@ -20,7 +21,7 @@ public class ClientService {
 //	}
 
 	private ClientService(ClientDao clientDao) {
-		this.clientDao = clientDao;
+		ClientService.clientDao = clientDao;
 	}
 
 //	public static ClientService getInstance() {
@@ -34,19 +35,23 @@ public class ClientService {
 	public long create(Client client) throws ServiceException {
 		if (client.getLastName() == null || client.getFirstName() == null) {
 			throw new ServiceException("Erreur dans le service : champs nom et/ou prenom vide");
-		} else {
-			try {
-				return this.clientDao.create(client);
-			} catch (DaoException e) {
-				e.printStackTrace();
-			}
+		} else if (!isLegal(client.getBirthday())) {
+			throw new ServiceException("Erreur dans le service : le client doit avoir plus de 18 ans");
+		} else if (!isEmailAvailable(client)) {
+			throw new ServiceException("Erreur dans le service : l'email a deja ete utilise");
 		}
+		try {
+			return clientDao.create(client);
+		} catch (DaoException e) {
+			e.printStackTrace();
+		}
+
 		return 0;
 	}
 
 	public Client findById(int id) throws ServiceException {
 		try {
-			return this.clientDao.findById(id).get();
+			return clientDao.findById(id).get();
 		} catch (DaoException e) {
 			e.printStackTrace();
 		}
@@ -55,16 +60,25 @@ public class ClientService {
 
 	public List<Client> findAll() throws ServiceException {
 		try {
-			return this.clientDao.findAll();
+			return clientDao.findAll();
 		} catch (DaoException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	public long delete(Client client) throws ServiceException {
+	public long delete(int id) throws ServiceException {
 		try {
-			return this.clientDao.delete(client);
+			return clientDao.delete(id);
+		} catch (DaoException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	public long update(Client client) throws ServiceException {
+		try {
+			return clientDao.update(client);
 		} catch (DaoException e) {
 			e.printStackTrace();
 		}
@@ -73,10 +87,28 @@ public class ClientService {
 
 	public long count() throws ServiceException {
 		try {
-			return this.clientDao.count();
+			return clientDao.count();
 		} catch (DaoException e) {
 			e.printStackTrace();
 		}
 		return 0;
+	}
+
+	public static boolean isLegal(LocalDate birthday) throws ServiceException {
+		try {
+			return clientDao.isLegal(birthday);
+		} catch (DaoException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public static boolean isEmailAvailable(Client client) throws ServiceException {
+		try {
+			return clientDao.isEmailAvailable(client);
+		} catch (DaoException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 }

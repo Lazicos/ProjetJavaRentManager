@@ -3,6 +3,7 @@ package com.epf.rentmanager.ui.servlet;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -49,14 +50,22 @@ public class ClientCreateServlet extends HttpServlet {
 		String lastName = request.getParameter("last_name");
 		String firstName = request.getParameter("first_name");
 		String email = request.getParameter("email");
-        LocalDate naissance = LocalDate.parse(request.getParameter("naissance"), DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-
+		LocalDate naissance = LocalDate.parse(request.getParameter("naissance"),
+				DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
 		try {
 			this.clientService.create(new Client(lastName, firstName, email, naissance));
+			response.sendRedirect("http://localhost:8080/rentmanager/users");
 		} catch (ServiceException e) {
-			e.printStackTrace();
+			request.setAttribute("erreur", e.getMessage());
+			request.setAttribute("lastName", lastName);
+			request.setAttribute("firstName", firstName);
+			request.setAttribute("email", email);
+			request.setAttribute("naissance", naissance.format(DateTimeFormatter
+				    .ofLocalizedDate(FormatStyle.SHORT)));
+			RequestDispatcher dispatcher = request.getRequestDispatcher(createUser);
+			dispatcher.forward(request, response);
 		}
-		response.sendRedirect("http://localhost:8080/rentmanager/users");
+
 	}
 }

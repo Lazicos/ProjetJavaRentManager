@@ -14,54 +14,68 @@
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <h1>
-                Utilisateurs
+                Reservations
             </h1>
         </section>
 
         <!-- Main content -->
-        <c:if test="${ !empty erreur }"><p style="color:red;"><c:out value="${ erreur }" /></p></c:if>
         <section class="content">
             <div class="row">
                 <div class="col-md-12">
                     <!-- Horizontal Form -->
                     <div class="box">
                         <!-- form start -->
-                        <form class="form-horizontal" method="post" action="/rentmanager/users/create">
+                        <form class="form-horizontal" method="post" action="/rentmanager/rents/update">
                             <div class="box-body">
                                 <div class="form-group">
-                                    <label for="last_name" class="col-sm-2 control-label">Nom</label>
+                                    <label for="car" class="col-sm-2 control-label">Vehicule</label>
 
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Nom" value="${lastName}" required>
+                                        <select class="form-control" id="car" name="car">
+                                        	<option value=${oldVehicle.id}>${oldVehicle.constructeur} ${oldVehicle.nbPlaces} places</option>
+                                        	<c:forEach items="${listVehicles}" var="vehicle">
+                                        	<c:if test = "${oldVehicle.id != vehicle.id}">
+                                            	<option value=${vehicle.id}>${vehicle.constructeur} ${vehicle.nbPlaces} places</option>
+                                        	</c:if> 
+                                        	</c:forEach>
+                                        	
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="first_name" class="col-sm-2 control-label">Prenom</label>
+                                    <label for="client" class="col-sm-2 control-label">Client</label>
 
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Prenom" value="${firstName}" required>
+                                        <select class="form-control" id="client" name="client">
+                                        <option value=${oldClient.id}>${oldClient.firstName} ${oldClient.lastName}</option>
+                                            <c:forEach items="${listUsers}" var="user">
+                                            	<c:if test = "${oldClient.id != user.id}">
+                                            	<option value=${user.id}>${user.firstName} ${user.lastName}</option>
+                                        	</c:if> 
+                                        	</c:forEach>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="email" class="col-sm-2 control-label">Email</label>
+                                    <label for="begin" class="col-sm-2 control-label">Date de debut</label>
 
                                     <div class="col-sm-10">
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Email"  value="${email}" required>
+                                        <input type="text" class="form-control" id="begin" name="begin" value="${oldBegin}"
+                                               data-inputmask="'alias': 'dd/mm/yyyy'" data-mask>
                                     </div>
                                 </div>
-                                </div>
                                 <div class="form-group">
-                                    <label for="end" class="col-sm-2 control-label">Date de naissance</label>
+                                    <label for="end" class="col-sm-2 control-label">Date de fin</label>
 
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="naissance" name="naissance" required 
-                                               data-inputmask="'alias': 'dd/mm/yyyy'" data-mask value="${naissance}">
+                                        <input type="text" class="form-control" id="end" name="end" value="${oldEnd}"
+                                               data-inputmask="'alias': 'dd/mm/yyyy'" data-mask>
                                     </div>
                                 </div>
                             </div>
                             <!-- /.box-body -->
-                        	<div class="box-footer">
-                                <button type="submit" id="btnSubmit" class="btn btn-info pull-right">Ajouter</button>
+                            <div class="box-footer">
+                                <button type="submit" class="btn btn-info pull-right">Modifier</button>
                             </div>
                             <!-- /.box-footer -->
                         </form>
